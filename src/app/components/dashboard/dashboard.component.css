@@ -1,0 +1,37 @@
+/* Custom styling for PrimeNG data table inside the dark theme */
+:host ::ng-deep .custom-dark-table .p-datatable-header,
+:host ::ng-deep .custom-dark-table .p-datatable-thead > tr > th {
+  background-color: transparent !important;
+  color: #d4d4d8 !important; /* neutral-300 */
+  border-color: #404040 !important; /* neutral-700 */
+}
+
+:host ::ng-deep .custom-dark-table .p-datatable-tbody > tr {
+  background-color: transparent !important;
+  color: #f4f4f5 !important; /* neutral-100 */
+}
+
+:host ::ng-deep .custom-dark-table .p-datatable-tbody > tr > td {
+  border-color: #262626 !important; /* neutral-800 */
+}
+
+:host ::ng-deep .custom-dark-table .p-datatable-tbody > tr:hover {
+  background-color: rgba(64, 64, 64, 0.5) !important; /* neutral-700 / 50% */
+}
+
+:host ::ng-deep .p-datatable-emptymessage td {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+:host ::ng-deep .p-toast-message-success {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  color: #34d399 !important;
+}
+
+:host ::ng-deep .p-toast-message-error {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: #f87171 !important;
+}

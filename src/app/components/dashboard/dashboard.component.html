@@ -1,0 +1,259 @@
+<div class="min-h-screen bg-neutral-900 text-neutral-100 p-6 font-sans">
+  
+  <p-toast></p-toast>
+  
+  <!-- Header -->
+  <header class="mb-8 border-b border-neutral-700 pb-5">
+    <div class="flex items-center gap-3">
+      <div class="p-3 bg-red-500/10 rounded-xl">
+        <i class="pi pi-shield text-red-500 text-3xl"></i>
+      </div>
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-white mb-1">
+          Wireless Intrusion Detection
+        </h1>
+        <p class="text-neutral-400 text-sm">Monitor rogue access points and manage trusted networks.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Row: Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div 
+      (click)="setView('alerts')"
+      class="cursor-pointer transition-all duration-300"
+      [class.opacity-50]="currentView !== 'alerts'"
+      [class.scale-105]="currentView === 'alerts'">
+      <div [ngClass]="currentView === 'alerts' ? 'border-red-500 shadow-lg shadow-red-500/20' : 'border-neutral-700 shadow-xl'" class="bg-neutral-800 border rounded-xl p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-neutral-400 font-semibold tracking-wider uppercase text-xs mb-1">Total Alerts</p>
+            <p class="text-4xl font-black text-red-500">{{ totalAlerts }}</p>
+          </div>
+          <div class="w-16 h-16 flex items-center justify-center bg-red-500/10 rounded-full border border-red-500/20 shadow-inner">
+            <i class="pi pi-exclamation-triangle text-red-500 text-3xl"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      (click)="setView('whitelist')"
+      class="cursor-pointer transition-all duration-300"
+      [class.opacity-50]="currentView !== 'whitelist'"
+      [class.scale-105]="currentView === 'whitelist'">
+      <div [ngClass]="currentView === 'whitelist' ? 'border-emerald-500 shadow-lg shadow-emerald-500/20' : 'border-neutral-700 shadow-xl'" class="bg-neutral-800 border rounded-xl p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-neutral-400 font-semibold tracking-wider uppercase text-xs mb-1">Total Whitelist</p>
+            <p class="text-4xl font-black text-emerald-400">{{ totalWhitelist }}</p>
+          </div>
+          <div class="w-16 h-16 flex items-center justify-center bg-emerald-500/10 rounded-full border border-emerald-500/20 shadow-inner">
+            <i class="pi pi-check-circle text-emerald-400 text-3xl"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Table -->
+  <div class="bg-neutral-800 border border-neutral-700 rounded-xl overflow-hidden shadow-2xl">
+    <div class="px-6 py-5 border-b border-neutral-700 bg-neutral-800/80">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <h2 class="text-xl font-bold text-white tracking-wide">
+            {{ currentView === 'alerts' ? 'Active Alerts' : 'Trusted Networks' }}
+          </h2>
+          
+          <span *ngIf="currentView === 'alerts'" class="bg-red-500/20 text-red-400 text-xs py-1 px-2 rounded-md border border-red-500/30">
+            {{ alerts.length || 0 }} detected
+          </span>
+          <span *ngIf="currentView === 'whitelist'" class="bg-emerald-500/20 text-emerald-400 text-xs py-1 px-2 rounded-md border border-emerald-500/30">
+            {{ whitelist.length || 0 }} trusted
+          </span>
+        </div>
+        
+        <!-- Global Search & Export Buttons -->
+        <div class="flex items-center gap-3">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search text-neutral-400"></i>
+            <input 
+              pInputText 
+              type="text" 
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')" 
+              placeholder="Search details..." 
+              class="w-full bg-neutral-900 border border-neutral-700 text-neutral-200 placeholder:text-neutral-500 px-10 py-2 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors" />
+          </span>
+          <p-button 
+            icon="pi pi-download" 
+            label="Export Report" 
+            severity="secondary" 
+            [outlined]="true"
+            (onClick)="dt.exportCSV()">
+          </p-button>
+          
+          <p-button 
+            icon="pi pi-plus" 
+            label="Add Whitelist" 
+            severity="success" 
+            (onClick)="showAddModal()">
+          </p-button>
+        </div>
+      </div>
+    </div>
+    
+    <p-table 
+      #dt
+      [value]="currentView === 'alerts' ? alerts : whitelist" 
+      [loading]="loading"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      [globalFilterFields]="['ssid', 'mac_address', 'alert_type', 'encryption']"
+      [stripedRows]="true"
+      styleClass="p-datatable-sm w-full custom-dark-table">
+      
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">
+            <div class="flex items-center gap-2">
+              Type
+              <p-columnFilter field="alert_type" matchMode="equals" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-select [ngModel]="value" [options]="alertTypes" (onChange)="filter($event.value)" placeholder="Any Type" [showClear]="true" styleClass="w-full">
+                    <ng-template let-option pTemplate="item">
+                      <span class="font-semibold">{{ option.label }}</span>
+                    </ng-template>
+                  </p-select>
+                </ng-template>
+              </p-columnFilter>
+            </div>
+          </th>
+          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">SSID</th>
+          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">MAC Address</th>
+          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">Details</th>
+          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">Date</th>
+          <th *ngIf="currentView === 'alerts'" class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4 text-center">Action</th>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="body" let-item>
+        <tr class="hover:bg-neutral-700/50 transition-colors border-b border-neutral-800">
+          <td class="p-4 align-middle">
+            <div *ngIf="currentView === 'alerts'" class="px-2 py-1 rounded text-xs font-bold inline-block border" 
+                 [ngClass]="{
+                   'bg-amber-500/20 text-amber-400 border-amber-500/30': item.alert_type === 'Rogue AP' || !item.alert_type,
+                   'bg-red-500/20 text-red-400 border-red-500/30': item.alert_type === 'Evil Twin',
+                   'bg-orange-500/20 text-orange-400 border-orange-500/30': item.alert_type === 'Deauth Attack'
+                 }">
+              {{ item.alert_type || 'Rogue AP' }}
+            </div>
+            <div *ngIf="currentView === 'whitelist'" class="px-2 py-1 rounded text-xs font-bold inline-block bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              Trusted
+            </div>
+          </td>
+          <td class="p-4 align-middle font-medium text-white">{{ item.ssid }}</td>
+          <td class="p-4 align-middle font-mono text-sm text-neutral-400">{{ item.mac_address }}</td>
+          <td class="p-4 align-middle text-neutral-300 text-sm">
+            Encryption: {{ item.encryption || 'Open' }}
+          </td>
+          <td class="p-4 align-middle text-neutral-400 text-sm">
+            {{ item.created_at | date:'medium' }}
+          </td>
+          <td *ngIf="currentView === 'alerts'" class="p-4 align-middle text-center">
+            <p-button 
+              label="Trust" 
+              icon="pi pi-check" 
+              [outlined]="true" 
+              severity="success"
+              size="small"
+              (onClick)="trustAlert(item)">
+            </p-button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="currentView === 'alerts' ? 6 : 5" class="text-center p-12 text-neutral-500 bg-neutral-900/50">
+            <div class="flex flex-col items-center justify-center space-y-4">
+              <div class="p-4 bg-emerald-500/10 rounded-full border border-emerald-500/20" *ngIf="currentView === 'alerts'">
+                <i class="pi pi-check text-4xl text-emerald-500"></i>
+              </div>
+              <div class="p-4 bg-neutral-500/10 rounded-full border border-neutral-500/20" *ngIf="currentView === 'whitelist'">
+                <i class="pi pi-th-large text-4xl text-neutral-500"></i>
+              </div>
+              <div>
+                <p class="text-white font-semibold text-lg">
+                  {{ currentView === 'alerts' ? 'No active alerts detected' : 'Whitelist is empty or no match' }}
+                </p>
+                <p class="text-sm">
+                  {{ currentView === 'alerts' ? 'Your wireless network is secure.' : 'Please adjust your search criteria.' }}
+                </p>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  
+  <!-- Add Whitelist Modal -->
+  <p-dialog 
+    header="Manual Add to Whitelist" 
+    [(visible)]="displayAddModal" 
+    [modal]="true" 
+    [style]="{ width: '400px' }" 
+    styleClass="bg-neutral-800 border-neutral-700 text-neutral-100 shadow-2xl"
+    [draggable]="false" 
+    [resizable]="false">
+    
+    <div class="flex flex-col gap-4 mt-2">
+      <div class="flex flex-col gap-2">
+        <label for="ssid" class="text-sm font-semibold text-neutral-300">SSID</label>
+        <input 
+          pInputText 
+          id="ssid" 
+          [(ngModel)]="newWhitelist.ssid" 
+          placeholder="e.g. Home_Network" 
+          class="w-full bg-neutral-900 border border-neutral-700 text-neutral-100 px-3 py-2 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="mac" class="text-sm font-semibold text-neutral-300">MAC Address</label>
+        <input 
+          pInputText 
+          id="mac" 
+          [(ngModel)]="newWhitelist.mac_address" 
+          placeholder="e.g. 00:11:22:33:44:55" 
+          class="w-full bg-neutral-900 border border-neutral-700 text-neutral-100 px-3 py-2 rounded-lg font-mono lowercase focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-neutral-300">Encryption</label>
+        <p-select 
+          [options]="encryptionOptions" 
+          [(ngModel)]="newWhitelist.encryption" 
+          appendTo="body"
+          styleClass="w-full bg-neutral-900 border-neutral-700 text-neutral-100">
+        </p-select>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end gap-2 mt-4 mt-4 py-2">
+        <p-button 
+          label="Cancel" 
+          severity="secondary" 
+          [text]="true" 
+          (onClick)="displayAddModal = false">
+        </p-button>
+        <p-button 
+          label="Save" 
+          icon="pi pi-check" 
+          severity="success" 
+          (onClick)="manualSaveWhitelist()">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+</div>

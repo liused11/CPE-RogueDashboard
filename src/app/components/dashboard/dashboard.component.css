@@ -35,3 +35,29 @@
   border: 1px solid rgba(239, 68, 68, 0.3) !important;
   color: #f87171 !important;
 }
+
+:host ::ng-deep .p-dialog {
+  border-radius: 1.5rem !important;
+  overflow: hidden !important;
+}
+
+:host ::ng-deep .p-dialog-header {
+  padding: 1.5rem 1.5rem 0.5rem 1.5rem !important;
+  background: white !important;
+}
+
+:host ::ng-deep .p-dialog-content {
+  padding: 0 1.5rem 1rem 1.5rem !important;
+  background: white !important;
+}
+
+:host ::ng-deep .p-dialog-footer {
+  padding: 1rem 1.5rem 1.5rem 1.5rem !important;
+  background: white !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header-title {
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: #1e293b !important;
+}

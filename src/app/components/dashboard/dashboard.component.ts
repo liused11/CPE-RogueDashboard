@@ -13,6 +13,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import { DatePickerModule } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,7 +28,8 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
     InputTextModule,
     FormsModule,
     DialogModule,
-    AutoCompleteModule
+    AutoCompleteModule,
+    DatePickerModule
   ],
   providers: [MessageService],
   templateUrl: './dashboard.component.html',
@@ -39,6 +41,12 @@ export class DashboardComponent implements OnInit {
   totalAlerts: number = 0;
   totalWhitelist: number = 0;
   loading: boolean = true;
+  
+  // Original data for filtering
+  originalAlerts: any[] = [];
+  originalWhitelist: any[] = [];
+
+  selectedDate: Date | undefined;
   
   alertTypes = [
     { label: 'Rogue AP', value: 'Rogue AP' },
@@ -121,10 +129,12 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
     this.supabaseService.getDashboardData().subscribe({
       next: (data: DashboardData) => {
-        this.alerts = data.alerts || [];
-        this.whitelist = data.whitelist || [];
+        this.originalAlerts = data.alerts || [];
+        this.originalWhitelist = data.whitelist || [];
         this.totalAlerts = data.total_alerts || 0;
         this.totalWhitelist = data.total_whitelist || 0;
+        
+        this.applyDateFilter();
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -141,8 +151,76 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  applyDateFilter() {
+    if (!this.selectedDate) {
+      this.alerts = [...this.originalAlerts];
+      this.whitelist = [...this.originalWhitelist];
+    } else {
+      const filterDate = new Date(this.selectedDate);
+      filterDate.setHours(0, 0, 0, 0);
+      const nextDate = new Date(filterDate);
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      this.alerts = this.originalAlerts.filter(item => {
+        const itemDate = new Date(item.created_at);
+        return itemDate >= filterDate && itemDate < nextDate;
+      });
+
+      this.whitelist = this.originalWhitelist.filter(item => {
+        const itemDate = new Date(item.created_at);
+        return itemDate >= filterDate && itemDate < nextDate;
+      });
+    }
+  }
+
+  onDateSelect() {
+    this.applyDateFilter();
+  }
+
+  onDateClear() {
+    this.selectedDate = undefined;
+    this.applyDateFilter();
+  }
+
   setView(view: 'alerts' | 'whitelist') {
     this.currentView = view;
+  }
+
+  exportToCSV() {
+    const data = this.currentView === 'alerts' ? this.alerts : this.whitelist;
+    if (!data || data.length === 0) {
+      this.messageService.add({ severity: 'info', summary: 'No Data', detail: 'There is no data to export.' });
+      return;
+    }
+
+    const headers = ['Type', 'SSID', 'MAC Address', 'Details', 'Encryption', 'Date'];
+    const rows = data.map(item => [
+      this.currentView === 'alerts' ? (item.alert_type || 'Rogue AP') : 'Trusted',
+      item.ssid || '',
+      item.mac_address || '',
+      item.details || '',
+      item.encryption || '',
+      item.created_at ? new Date(item.created_at).toLocaleString() : ''
+    ]);
+
+    let csvContent = '\uFEFF'; // Bom for Excel Thai support
+    csvContent += headers.join(',') + '\n';
+    rows.forEach(row => {
+      const formattedRow = row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(',');
+      csvContent += formattedRow + '\n';
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const filename = `wids_log_${this.currentView}_${new Date().toISOString().split('T')[0]}.csv`;
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   showAddModal() {
@@ -163,16 +241,18 @@ export class DashboardComponent implements OnInit {
         this.newWhitelist.encryption
       );
       
-      // Update local array
-      this.whitelist = [
-        ...this.whitelist,
+      // Update original array
+      this.originalWhitelist = [
+        ...this.originalWhitelist,
         { 
           ssid: this.newWhitelist.ssid, 
           mac_address: this.newWhitelist.mac_address, 
           encryption: this.newWhitelist.encryption,
           created_at: new Date().toISOString()
         }
-      ];
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      
+      this.applyDateFilter();
       this.totalWhitelist++;
       
       // Hide and reset
@@ -223,14 +303,14 @@ export class DashboardComponent implements OnInit {
     try {
       await this.supabaseService.trustAlert(alert.ssid, alert.mac_address, alert.encryption);
       
-      // Dynamically remove row from alerts
-      this.alerts = this.alerts.filter(a => a.mac_address !== alert.mac_address || a.ssid !== alert.ssid);
+      // Update original arrays
+      this.originalAlerts = this.originalAlerts.filter(a => a.mac_address !== alert.mac_address || a.ssid !== alert.ssid);
+      this.originalWhitelist = [
+        ...this.originalWhitelist,
+        { ...alert, created_at: new Date().toISOString() }
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       
-      // Add the alert to the local whitelist array
-      this.whitelist = [
-        ...this.whitelist,
-        { ...alert, created_at: new Date().toISOString() } // or trust timestamp
-      ];
+      this.applyDateFilter();
       
       // Update counts
       this.totalAlerts--;

@@ -12,6 +12,7 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,7 +26,8 @@ import { DialogModule } from 'primeng/dialog';
     SelectModule,
     InputTextModule,
     FormsModule,
-    DialogModule
+    DialogModule,
+    AutoCompleteModule
   ],
   providers: [MessageService],
   templateUrl: './dashboard.component.html',
@@ -62,6 +64,13 @@ export class DashboardComponent implements OnInit {
     { label: 'Open', value: 'Open' }
   ];
 
+  // Simulator Modal
+  displaySimulatorModal: boolean = false;
+  
+  // Search Autocomplete
+  searchQuery: any;
+  filteredSuggestions: string[] = [];
+  
   constructor(
     private supabaseService: SupabaseService,
     private messageService: MessageService,
@@ -70,6 +79,42 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.loadDashboardData();
+  }
+
+  filterSearch(event: any) {
+    let query = event.query.toLowerCase();
+    
+    // Combine all SSIDs and MACs from both lists, ignoring undefined/nulls
+    let allStrings: string[] = [];
+    
+    // Collect from alerts
+    this.alerts.forEach(item => {
+        if (item.ssid) allStrings.push(item.ssid);
+        if (item.mac_address) allStrings.push(item.mac_address);
+    });
+    
+    // Collect from whitelist
+    this.whitelist.forEach(item => {
+        if (item.ssid) allStrings.push(item.ssid);
+        if (item.mac_address) allStrings.push(item.mac_address);
+    });
+    
+    // Get unique values only
+    let uniqueSuggestions = [...new Set(allStrings)];
+    
+    // Filter matching query
+    this.filteredSuggestions = uniqueSuggestions.filter(val => 
+        val.toLowerCase().includes(query)
+    );
+  }
+
+  onSearchSelect(event: any, tableRef: any) {
+     // event contains the raw string selected
+     tableRef.filterGlobal(event, 'contains');
+  }
+
+  onSearchClear(tableRef: any) {
+     tableRef.filterGlobal('', 'contains');
   }
 
   loadDashboardData() {
@@ -138,6 +183,39 @@ export class DashboardComponent implements OnInit {
     } catch (error) {
       console.error('Error adding to whitelist manually:', error);
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not manually add to whitelist.' });
+    }
+  }
+
+  showSimulatorModal() {
+    this.displaySimulatorModal = true;
+  }
+
+  async injectPayload(filename: string) {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/inject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source_file: filename })
+      });
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        this.messageService.add({ 
+            severity: 'success', 
+            summary: 'Payload Injected', 
+            detail: `Successfully injected ${filename}. demo_scanner.py will detect it shortly.` 
+        });
+        // We do not close the modal automatically so the user can send multiple payloads
+      } else {
+        this.messageService.add({ severity: 'error', summary: 'Injection Error', detail: data.message });
+      }
+    } catch (error) {
+      console.error('Error injecting payload:', error);
+      this.messageService.add({ 
+          severity: 'error', 
+          summary: 'Network Error', 
+          detail: 'Could not connect to the Simulator API. Is web_simulator.py running?' 
+      });
     }
   }
 

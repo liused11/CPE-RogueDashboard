@@ -1,259 +1,405 @@
-<div class="min-h-screen bg-neutral-900 text-neutral-100 p-6 font-sans">
-  
+<div class="flex h-screen bg-[#f8f9fa] font-sans text-slate-800 overflow-hidden">
   <p-toast></p-toast>
   
-  <!-- Header -->
-  <header class="mb-8 border-b border-neutral-700 pb-5">
-    <div class="flex items-center gap-3">
-      <div class="p-3 bg-red-500/10 rounded-xl">
-        <i class="pi pi-shield text-red-500 text-3xl"></i>
+  <!-- Sidebar -->
+  <aside class="w-[72px] bg-white border-r border-slate-200 flex flex-col items-center py-4 justify-between h-full flex-shrink-0 z-10 shadow-sm relative">
+    <div class="flex flex-col gap-4 w-full px-3">
+        <!-- Sidebar Icons -->
+        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 cursor-pointer hover:bg-blue-100 transition-colors tooltip-wrapper shadow-inner border border-blue-100">
+          <i class="pi pi-briefcase text-xl"></i>
+        </div>
+        <div class="w-12 h-12 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl flex items-center justify-center cursor-pointer transition-colors">
+          <i class="pi pi-globe text-xl"></i>
+        </div>
+        <div class="w-12 h-12 bg-[#2b6eff] text-white rounded-xl flex items-center justify-center shadow-md cursor-pointer shadow-blue-500/30">
+          <i class="pi pi-home text-xl"></i>
+        </div>
+        <div class="w-12 h-12 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl flex items-center justify-center cursor-pointer transition-colors">
+          <i class="pi pi-building text-xl"></i>
+        </div>
+        <div class="w-12 h-12 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl flex items-center justify-center cursor-pointer transition-colors">
+          <i class="pi pi-th-large text-xl"></i>
+        </div>
+        <div class="w-12 h-12 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl flex items-center justify-center cursor-pointer transition-colors">
+          <i class="pi pi-user text-xl"></i>
+        </div>
+        <div class="w-12 h-12 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl flex items-center justify-center cursor-pointer transition-colors">
+          <i class="pi pi-car text-xl"></i>
+        </div>
+    </div>
+    
+    <!-- Sidebar Bottom -->
+    <div class="flex flex-col gap-4 w-full px-3 items-center">
+        <div class="w-12 h-12 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl flex items-center justify-center cursor-pointer transition-colors">
+          <i class="pi pi-cog text-xl"></i>
+        </div>
+        <div class="w-12 h-12 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-xl flex items-center justify-center cursor-pointer transition-colors">
+          <i class="pi pi-question-circle text-xl"></i>
+        </div>
+        <div class="w-full border-t border-slate-200 my-1"></div>
+        <img src="https://ui-avatars.com/api/?name=Admin&background=d97706&color=fff" class="w-9 h-9 rounded-full cursor-pointer hover:ring-2 ring-blue-400 transition-all shadow-sm" />
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-auto p-10 relative">
+    
+    <!-- Header / Stats Row -->
+    <div class="flex gap-8 mb-8">
+      
+      <!-- Box 1: Total Alerts (Like Total Logs) -->
+      <div class="bg-white border-2 border-slate-100 rounded-2xl p-6 w-[360px] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.03)] flex items-start justify-between">
+         <div class="flex flex-col">
+            <span class="text-slate-400 font-medium text-sm mb-2">Total Alerts</span>
+            <span class="text-[32px] font-bold text-[#2b6eff] leading-none mb-1">{{ totalAlerts }}</span>
+            <span class="text-xs text-slate-400 font-medium">On null</span>
+         </div>
+         <div class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-600 shadow-sm mt-1">
+            <i class="pi pi-database text-lg"></i>
+         </div>
       </div>
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight text-white mb-1">
-          Wireless Intrusion Detection
-        </h1>
-        <p class="text-neutral-400 text-sm">Monitor rogue access points and manage trusted networks.</p>
+
+      <!-- Box 2: Total Whitelist (Like Activities) -->
+      <div class="bg-white border-2 border-slate-100 rounded-2xl p-6 w-[360px] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.03)] flex items-start justify-between">
+         <div class="flex flex-col">
+            <span class="text-slate-400 font-medium text-sm mb-2">Activities</span>
+            <span class="text-[32px] font-bold text-[#2b6eff] leading-none mb-1">{{ totalWhitelist }}</span>
+            <span class="text-xs text-slate-400 font-medium">Events</span>
+         </div>
+         <div class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-600 shadow-sm mt-1">
+            <i class="pi pi-bolt text-lg"></i>
+         </div>
       </div>
     </div>
-  </header>
 
-  <!-- Top Row: Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-    <div 
-      (click)="setView('alerts')"
-      class="cursor-pointer transition-all duration-300"
-      [class.opacity-50]="currentView !== 'alerts'"
-      [class.scale-105]="currentView === 'alerts'">
-      <div [ngClass]="currentView === 'alerts' ? 'border-red-500 shadow-lg shadow-red-500/20' : 'border-neutral-700 shadow-xl'" class="bg-neutral-800 border rounded-xl p-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-neutral-400 font-semibold tracking-wider uppercase text-xs mb-1">Total Alerts</p>
-            <p class="text-4xl font-black text-red-500">{{ totalAlerts }}</p>
-          </div>
-          <div class="w-16 h-16 flex items-center justify-center bg-red-500/10 rounded-full border border-red-500/20 shadow-inner">
-            <i class="pi pi-exclamation-triangle text-red-500 text-3xl"></i>
-          </div>
-        </div>
+    <!-- Main Table Container -->
+    <div class="bg-white border-2 border-slate-100 rounded-2xl overflow-hidden shadow-[0_4px_16px_-4px_rgba(0,0,0,0.03)]">
+      
+      <!-- Title & Controls -->
+      <div class="px-6 py-6 flex flex-wrap items-center justify-between gap-4">
+         <!-- Title -->
+         <div class="flex items-center gap-2 text-[#2b6eff]">
+            <i class="pi pi-history text-xl"></i>
+            <h2 class="text-[17px] font-bold tracking-wide">บันทึกกิจกรรม</h2>
+         </div>
+
+         <!-- Controls Right -->
+         <div class="flex items-center gap-3 ml-auto">
+            
+            <!-- Custom Date Picker Mock -->
+            <div class="flex items-center border border-slate-200 rounded-xl px-4 py-2 bg-white text-slate-400 text-sm min-w-[120px] cursor-pointer hover:border-blue-400 transition-colors">
+              <span class="flex-1 font-medium">วันที่</span>
+              <i class="pi pi-calendar border-l border-slate-200 pl-3 ml-2 text-slate-500"></i>
+            </div>
+            
+            <!-- PrimeNG AutoComplete for Search -->
+            <div class="relative w-72 h-10 flex items-center">
+              <i class="pi pi-search absolute left-4 text-slate-400 text-xs z-10 pointer-events-none"></i>
+              <p-autoComplete 
+                [(ngModel)]="searchQuery"
+                [suggestions]="filteredSuggestions"
+                (completeMethod)="filterSearch($event)"
+                (onSelect)="onSearchSelect($event, dt)"
+                (onClear)="onSearchClear(dt)"
+                [showClear]="true"
+                placeholder="ค้นหากิจกรรม..."
+                styleClass="w-full h-full"
+                inputStyleClass="w-full h-full pl-9 pr-8 text-[13px] bg-white border border-slate-200 rounded-xl text-slate-600 outline-none placeholder:text-slate-400 font-medium hover:border-blue-300 focus:border-[#2b6eff] focus:ring-1 focus:ring-[#2b6eff] transition-all shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)]">
+              </p-autoComplete>
+            </div>
+            
+            <!-- Export -->
+            <button (click)="dt.exportCSV()" class="flex items-center justify-center gap-2 px-4 py-2 border border-blue-200 text-[#2b6eff] rounded-xl text-xs font-bold hover:bg-blue-50 transition-colors h-10 bg-white shadow-sm">
+               <i class="pi pi-download text-xs font-bold leading-none"></i> Export
+            </button>
+
+            <!-- Simulator & Add buttons hidden in a dropdown or just kept minimalist -->
+            <div class="border-l border-slate-200 pl-3 flex gap-2">
+                <!-- Simulator button matched to styling -->
+                <button (click)="showSimulatorModal()" class="flex items-center justify-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 border border-purple-200 rounded-xl text-xs font-bold hover:bg-purple-100 transition-colors h-10 shadow-sm" title="Open Simulation Menu">
+                   <i class="pi pi-play font-bold text-xs"></i> Simulate
+                </button>
+                <button (click)="showAddModal()" class="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-colors h-10 shadow-sm" title="Manual Add to Whitelist">
+                   <i class="pi pi-plus font-bold text-xs"></i> Add Valid
+                </button>
+            </div>
+         </div>
       </div>
-    </div>
 
-    <div
-      (click)="setView('whitelist')"
-      class="cursor-pointer transition-all duration-300"
-      [class.opacity-50]="currentView !== 'whitelist'"
-      [class.scale-105]="currentView === 'whitelist'">
-      <div [ngClass]="currentView === 'whitelist' ? 'border-emerald-500 shadow-lg shadow-emerald-500/20' : 'border-neutral-700 shadow-xl'" class="bg-neutral-800 border rounded-xl p-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-neutral-400 font-semibold tracking-wider uppercase text-xs mb-1">Total Whitelist</p>
-            <p class="text-4xl font-black text-emerald-400">{{ totalWhitelist }}</p>
-          </div>
-          <div class="w-16 h-16 flex items-center justify-center bg-emerald-500/10 rounded-full border border-emerald-500/20 shadow-inner">
-            <i class="pi pi-check-circle text-emerald-400 text-3xl"></i>
-          </div>
-        </div>
+      <!-- Custom Tabs -->
+      <div class="px-6 border-b-2 border-slate-100 flex gap-10 mt-2">
+         <div (click)="setView('whitelist')" class="cursor-pointer pb-4 flex items-center gap-2 relative transition-colors"
+              [class.text-blue-600]="currentView === 'whitelist'"
+              [class.text-slate-500]="currentView !== 'whitelist'">
+            <i class="pi pi-check-circle" [class.text-emerald-500]="currentView === 'whitelist'"></i>
+            <span class="font-bold text-[13px]" [class.text-[#2b6eff]]="currentView === 'whitelist'">กิจกรรมปกติ (Normal)</span>
+            <span class="bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center shadow-sm">{{ whitelist.length }}</span>
+            <div *ngIf="currentView === 'whitelist'" class="absolute -bottom-[2px] left-0 w-full h-[3px] bg-[#2b6eff] rounded-t-lg"></div>
+         </div>
+
+         <div (click)="setView('alerts')" class="cursor-pointer pb-4 flex items-center gap-2 relative transition-colors"
+              [class.text-[#2b6eff]]="currentView === 'alerts'"
+              [class.text-slate-500]="currentView !== 'alerts'">
+            <i class="pi pi-exclamation-triangle" [class.text-red-500]="currentView === 'alerts'"></i>
+            <span class="font-bold text-[13px]" [class.text-red-500]="currentView === 'alerts'">สิ่งที่ต้องตรวจสอบ (Abnormal)</span>
+            <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-[4px] min-w-[20px] text-center shadow-sm">{{ alerts.length }}</span>
+            <div *ngIf="currentView === 'alerts'" class="absolute -bottom-[2px] left-0 w-full h-[3px] bg-[#2b6eff] rounded-t-lg"></div>
+         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Main Table -->
-  <div class="bg-neutral-800 border border-neutral-700 rounded-xl overflow-hidden shadow-2xl">
-    <div class="px-6 py-5 border-b border-neutral-700 bg-neutral-800/80">
-      <div class="flex items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-          <h2 class="text-xl font-bold text-white tracking-wide">
-            {{ currentView === 'alerts' ? 'Active Alerts' : 'Trusted Networks' }}
-          </h2>
-          
-          <span *ngIf="currentView === 'alerts'" class="bg-red-500/20 text-red-400 text-xs py-1 px-2 rounded-md border border-red-500/30">
-            {{ alerts.length || 0 }} detected
-          </span>
-          <span *ngIf="currentView === 'whitelist'" class="bg-emerald-500/20 text-emerald-400 text-xs py-1 px-2 rounded-md border border-emerald-500/30">
-            {{ whitelist.length || 0 }} trusted
-          </span>
-        </div>
+      <!-- Data Table -->
+      <div class="px-2">
+      <p-table 
+        #dt
+        [value]="currentView === 'alerts' ? alerts : whitelist" 
+        [loading]="loading"
+        [paginator]="true"
+        [rows]="10"
+        [globalFilterFields]="['ssid', 'mac_address', 'alert_type', 'encryption']"
+        styleClass="w-full border-none">
         
-        <!-- Global Search & Export Buttons -->
-        <div class="flex items-center gap-3">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search text-neutral-400"></i>
-            <input 
-              pInputText 
-              type="text" 
-              (input)="dt.filterGlobal($any($event.target).value, 'contains')" 
-              placeholder="Search details..." 
-              class="w-full bg-neutral-900 border border-neutral-700 text-neutral-200 placeholder:text-neutral-500 px-10 py-2 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors" />
-          </span>
-          <p-button 
-            icon="pi pi-download" 
-            label="Export Report" 
-            severity="secondary" 
-            [outlined]="true"
-            (onClick)="dt.exportCSV()">
-          </p-button>
-          
-          <p-button 
-            icon="pi pi-plus" 
-            label="Add Whitelist" 
-            severity="success" 
-            (onClick)="showAddModal()">
-          </p-button>
-        </div>
-      </div>
-    </div>
-    
-    <p-table 
-      #dt
-      [value]="currentView === 'alerts' ? alerts : whitelist" 
-      [loading]="loading"
-      [tableStyle]="{ 'min-width': '50rem' }"
-      [globalFilterFields]="['ssid', 'mac_address', 'alert_type', 'encryption']"
-      [stripedRows]="true"
-      styleClass="p-datatable-sm w-full custom-dark-table">
-      
-      <ng-template pTemplate="header">
-        <tr>
-          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">
-            <div class="flex items-center gap-2">
-              Type
-              <p-columnFilter field="alert_type" matchMode="equals" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
-                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                  <p-select [ngModel]="value" [options]="alertTypes" (onChange)="filter($event.value)" placeholder="Any Type" [showClear]="true" styleClass="w-full">
-                    <ng-template let-option pTemplate="item">
-                      <span class="font-semibold">{{ option.label }}</span>
-                    </ng-template>
-                  </p-select>
-                </ng-template>
-              </p-columnFilter>
-            </div>
-          </th>
-          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">SSID</th>
-          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">MAC Address</th>
-          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">Details</th>
-          <th class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4">Date</th>
-          <th *ngIf="currentView === 'alerts'" class="bg-neutral-900 border-b border-neutral-700 text-neutral-300 font-semibold p-4 text-center">Action</th>
-        </tr>
-      </ng-template>
-      
-      <ng-template pTemplate="body" let-item>
-        <tr class="hover:bg-neutral-700/50 transition-colors border-b border-neutral-800">
-          <td class="p-4 align-middle">
-            <div *ngIf="currentView === 'alerts'" class="px-2 py-1 rounded text-xs font-bold inline-block border" 
-                 [ngClass]="{
-                   'bg-amber-500/20 text-amber-400 border-amber-500/30': item.alert_type === 'Rogue AP' || !item.alert_type,
-                   'bg-red-500/20 text-red-400 border-red-500/30': item.alert_type === 'Evil Twin',
-                   'bg-orange-500/20 text-orange-400 border-orange-500/30': item.alert_type === 'Deauth Attack'
-                 }">
-              {{ item.alert_type || 'Rogue AP' }}
-            </div>
-            <div *ngIf="currentView === 'whitelist'" class="px-2 py-1 rounded text-xs font-bold inline-block bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              Trusted
-            </div>
-          </td>
-          <td class="p-4 align-middle font-medium text-white">{{ item.ssid }}</td>
-          <td class="p-4 align-middle font-mono text-sm text-neutral-400">{{ item.mac_address }}</td>
-          <td class="p-4 align-middle text-neutral-300 text-sm">
-            Encryption: {{ item.encryption || 'Open' }}
-          </td>
-          <td class="p-4 align-middle text-neutral-400 text-sm">
-            {{ item.created_at | date:'medium' }}
-          </td>
-          <td *ngIf="currentView === 'alerts'" class="p-4 align-middle text-center">
-            <p-button 
-              label="Trust" 
-              icon="pi pi-check" 
-              [outlined]="true" 
-              severity="success"
-              size="small"
-              (onClick)="trustAlert(item)">
-            </p-button>
-          </td>
-        </tr>
-      </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left" style="width: 15%;">Type</th>
+            <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left" style="width: 20%;">SSID</th>
+            <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left" style="width: 20%;">MAC Address</th>
+            <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left" style="width: 20%;">Details</th>
+            <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left" style="width: 15%;">Date</th>
+            <th *ngIf="currentView === 'alerts'" class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-center" style="width: 10%;">Action</th>
+          </tr>
+        </ng-template>
 
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td [attr.colspan]="currentView === 'alerts' ? 6 : 5" class="text-center p-12 text-neutral-500 bg-neutral-900/50">
-            <div class="flex flex-col items-center justify-center space-y-4">
-              <div class="p-4 bg-emerald-500/10 rounded-full border border-emerald-500/20" *ngIf="currentView === 'alerts'">
-                <i class="pi pi-check text-4xl text-emerald-500"></i>
-              </div>
-              <div class="p-4 bg-neutral-500/10 rounded-full border border-neutral-500/20" *ngIf="currentView === 'whitelist'">
-                <i class="pi pi-th-large text-4xl text-neutral-500"></i>
-              </div>
-              <div>
-                <p class="text-white font-semibold text-lg">
-                  {{ currentView === 'alerts' ? 'No active alerts detected' : 'Whitelist is empty or no match' }}
-                </p>
-                <p class="text-sm">
-                  {{ currentView === 'alerts' ? 'Your wireless network is secure.' : 'Please adjust your search criteria.' }}
-                </p>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+        <ng-template pTemplate="body" let-item>
+          <tr class="border-b border-slate-100/70 hover:bg-slate-50 transition-colors">
+            <!-- Type -->
+            <td class="py-4 px-6">
+              <span *ngIf="currentView === 'alerts'" class="inline-flex items-center justify-center px-2.5 py-1 rounded border text-xs font-bold tracking-wide"
+                 [ngClass]="{
+                   'bg-amber-50 text-amber-600 border-amber-200': item.alert_type === 'Rogue AP' || !item.alert_type,
+                   'bg-rose-50 text-rose-600 border-rose-200': item.alert_type === 'Evil Twin',
+                   'bg-orange-50 text-orange-600 border-orange-200': item.alert_type === 'Deauth Attack'
+                 }">
+                {{ item.alert_type || 'Rogue AP' }}
+              </span>
+              <span *ngIf="currentView === 'whitelist'" class="inline-flex items-center justify-center px-2.5 py-1 rounded bg-[#e6fcf5] text-[#10b981] font-bold text-xs border border-emerald-100 shadow-sm">
+                 Trusted
+              </span>
+            </td>
+            <!-- SSID -->
+            <td class="py-4 px-6 text-[13px] font-bold text-slate-700">
+               {{ item.ssid }}
+            </td>
+            <!-- MAC Address -->
+            <td class="py-4 px-6 text-[13px] font-mono text-slate-500">
+               {{ item.mac_address }}
+            </td>
+            <!-- Details -->
+            <td class="py-4 px-6 text-[13px] text-slate-600">
+               Encryption: <span class="font-medium">{{ item.encryption || 'Open' }}</span>
+            </td>
+            <!-- Date -->
+            <td class="py-4 px-6 text-[13px] font-medium text-slate-500">
+               {{ item.created_at | date:'medium' }}
+            </td>
+            <!-- Action -->
+            <td *ngIf="currentView === 'alerts'" class="py-4 px-6 text-center">
+               <button (click)="trustAlert(item)" class="text-[#2b6eff] font-bold text-[13px] hover:text-blue-800 transition-colors flex items-center justify-center gap-1.5 mx-auto" title="Trust this network">
+                  <i class="pi pi-check font-bold"></i> Trust
+               </button>
+            </td>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6" class="text-center py-16 text-slate-500">
+                <i class="pi pi-server text-5xl mb-4 text-slate-200"></i>
+                <p class="font-medium text-slate-600">ไม่มีข้อมูลแสดงผล</p>
+                <p class="text-xs mt-1 text-slate-400">ระบบไม่พบการเคลื่อนไหวในประวัติเครือข่าย</p>
+              </td>
+            </tr>
+        </ng-template>
+      </p-table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Add Whitelist Modal -->
+<p-dialog 
+  header="Manual Add to Whitelist" 
+  [(visible)]="displayAddModal" 
+  [modal]="true" 
+  [style]="{ width: '420px' }" 
+  styleClass="bg-white border-none rounded-[1.25rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] overflow-hidden font-sans"
+  [draggable]="false" 
+  [resizable]="false">
   
-  <!-- Add Whitelist Modal -->
-  <p-dialog 
-    header="Manual Add to Whitelist" 
-    [(visible)]="displayAddModal" 
-    [modal]="true" 
-    [style]="{ width: '400px' }" 
-    styleClass="bg-neutral-800 border-neutral-700 text-neutral-100 shadow-2xl"
-    [draggable]="false" 
-    [resizable]="false">
-    
-    <div class="flex flex-col gap-4 mt-2">
-      <div class="flex flex-col gap-2">
-        <label for="ssid" class="text-sm font-semibold text-neutral-300">SSID</label>
+  <!-- Banner -->
+  <div class="bg-gradient-to-br from-[#eff6ff] to-[#f8fbff] flex items-center gap-4 px-5 py-4 mx-3 mt-3 rounded-2xl border border-[#dbeafe] mb-5">
+    <div class="w-11 h-11 bg-[#dbeafe] rounded-xl flex items-center justify-center shrink-0">
+      <i class="pi pi-shield text-[18px] text-[#3b82f6]"></i>
+    </div>
+    <div>
+      <p class="text-[13px] font-[700] text-[#1e40af] mb-0.5">เพิ่มอุปกรณ์ที่ไว้ใจ</p>
+      <p class="text-[12px] text-[#64748b] font-medium">ข้อมูลจะถูกบันทึกในฐานข้อมูล Supabase</p>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4 px-3 mb-2">
+    <div class="flex flex-col gap-1.5">
+      <label for="ssid" class="text-[13px] font-[800] text-[#1e293b] flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 bg-[#3b82f6] rounded-full inline-block"></span> SSID
+      </label>
+      <div class="relative">
+        <i class="pi pi-wifi absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8] text-[14px]"></i>
         <input 
           pInputText 
           id="ssid" 
           [(ngModel)]="newWhitelist.ssid" 
           placeholder="e.g. Home_Network" 
-          class="w-full bg-neutral-900 border border-neutral-700 text-neutral-100 px-3 py-2 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
+          class="w-full border border-[#e2e8f0] bg-[#f8fafc] text-slate-800 text-sm pl-10 pr-4 py-3 rounded-xl hover:border-[#93c5fd] focus:border-[#3b82f6] focus:bg-white focus:ring-2 focus:ring-[#3b82f6]/15 outline-none transition-all placeholder:text-slate-400 font-medium" />
       </div>
+    </div>
 
-      <div class="flex flex-col gap-2">
-        <label for="mac" class="text-sm font-semibold text-neutral-300">MAC Address</label>
+    <div class="flex flex-col gap-1.5">
+      <label for="mac" class="text-[13px] font-[800] text-[#1e293b] flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 bg-[#3b82f6] rounded-full inline-block"></span> MAC Address
+      </label>
+      <div class="relative">
+        <i class="pi pi-tag absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8] text-[14px]"></i>
         <input 
           pInputText 
           id="mac" 
           [(ngModel)]="newWhitelist.mac_address" 
           placeholder="e.g. 00:11:22:33:44:55" 
-          class="w-full bg-neutral-900 border border-neutral-700 text-neutral-100 px-3 py-2 rounded-lg font-mono lowercase focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-sm font-semibold text-neutral-300">Encryption</label>
-        <p-select 
-          [options]="encryptionOptions" 
-          [(ngModel)]="newWhitelist.encryption" 
-          appendTo="body"
-          styleClass="w-full bg-neutral-900 border-neutral-700 text-neutral-100">
-        </p-select>
+          class="w-full border border-[#e2e8f0] bg-[#f8fafc] text-slate-800 text-sm pl-10 pr-4 py-3 rounded-xl font-mono hover:border-[#93c5fd] focus:border-[#3b82f6] focus:bg-white focus:ring-2 focus:ring-[#3b82f6]/15 outline-none transition-all placeholder:text-slate-400" />
       </div>
     </div>
 
-    <ng-template pTemplate="footer">
-      <div class="flex justify-end gap-2 mt-4 mt-4 py-2">
-        <p-button 
-          label="Cancel" 
-          severity="secondary" 
-          [text]="true" 
-          (onClick)="displayAddModal = false">
-        </p-button>
-        <p-button 
-          label="Save" 
-          icon="pi pi-check" 
-          severity="success" 
-          (onClick)="manualSaveWhitelist()">
-        </p-button>
-      </div>
-    </ng-template>
-  </p-dialog>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[13px] font-[800] text-[#1e293b] flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 bg-[#3b82f6] rounded-full inline-block"></span> Encryption
+      </label>
+      <p-select 
+        [options]="encryptionOptions" 
+        [(ngModel)]="newWhitelist.encryption" 
+        appendTo="body"
+        styleClass="w-full border border-[#e2e8f0] bg-[#f8fafc] rounded-xl hover:border-[#93c5fd] font-medium text-slate-700">
+      </p-select>
+    </div>
+  </div>
 
-</div>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3 pt-4 pb-3 px-3 border-t border-[#f1f5f9] mt-2">
+      <button 
+        (click)="displayAddModal = false"
+        class="px-5 py-2.5 text-[13px] font-[700] text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc] rounded-xl transition-colors cursor-pointer border border-transparent hover:border-[#e2e8f0]">
+        Cancel
+      </button>
+      <button 
+        (click)="manualSaveWhitelist()"
+        class="px-6 py-2.5 bg-[#3b82f6] text-white text-[13px] font-[700] rounded-xl hover:bg-[#2563eb] active:scale-95 transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-blue-500/25">
+        <i class="pi pi-check text-[13px]"></i> Save Settings
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Simulator Modal -->
+<p-dialog 
+  header="WIDS Attack Simulator" 
+  [(visible)]="displaySimulatorModal" 
+  [modal]="true" 
+  [style]="{ width: '750px' }" 
+  styleClass="bg-white border-none rounded-[1.25rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden font-sans"
+  [draggable]="false" 
+  [resizable]="false">
+  
+  <div class="flex flex-col gap-4 mt-2 p-1">
+    <!-- Top banner box -->
+    <div class="flex flex-col justify-center items-center text-center bg-[#f8fbff] py-6 px-8 rounded-2xl border border-[#eef2f6] relative overflow-hidden">
+      <!-- Background subtle icon -->
+      <div class="absolute -right-8 -bottom-4 bg-[#eef4ff] w-32 h-32 rounded-full opacity-60"></div>
+      <div class="absolute -right-2 top-4 bg-[#eef4ff] w-16 h-16 rounded-full opacity-60"></div>
+      
+      <h3 class="text-[#2b6eff] font-bold text-[16px] tracking-wide mb-1.5 z-10">Python Scanner Engine Integration</h3>
+      <p class="text-slate-500 text-[13px] max-w-md z-10 leading-relaxed font-medium">
+        Inject mock payload files into standard Netsh output pipelines. 
+        <br>Click a scenario below to trace rule validations in real-time.
+      </p>
+    </div>
+
+    <!-- Simulator Buttons grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pb-1">
+      
+        <!-- Safe Mode -->
+        <button (click)="injectPayload('mock_1_normal.txt')" class="bg-white border border-[#eef2f6] hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300 p-5 rounded-2xl flex flex-col items-center justify-center gap-3 group relative overflow-hidden cursor-pointer">
+            <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="w-12 h-12 bg-[#e6fcf5] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="pi pi-shield text-lg font-bold text-[#10b981]"></i>
+            </div>
+            <div class="text-center z-10">
+                <h3 class="text-[14px] font-bold text-[#1e293b]">Normal Network</h3>
+                <p class="text-slate-400 text-[12px] mt-0.5 font-medium">Safe scenario, no alerts</p>
+            </div>
+        </button>
+
+        <!-- Rogue AP -->
+        <button (click)="injectPayload('mock_2_rogue_ap.txt')" class="bg-white border border-[#eef2f6] hover:border-amber-300 hover:shadow-lg hover:shadow-amber-500/10 transition-all duration-300 p-5 rounded-2xl flex flex-col items-center justify-center gap-3 group relative overflow-hidden cursor-pointer">
+            <div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="w-12 h-12 bg-[#fffbeb] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="pi pi-wifi text-lg font-bold text-[#f59e0b]"></i>
+            </div>
+            <div class="text-center z-10">
+                <h3 class="text-[14px] font-bold text-[#1e293b]">Rogue AP</h3>
+                <p class="text-slate-400 text-[12px] mt-0.5 font-medium">Fake SSID, unknown MAC</p>
+            </div>
+        </button>
+
+        <!-- Downgrade -->
+        <button (click)="injectPayload('mock_3_downgrade.txt')" class="bg-white border border-[#eef2f6] hover:border-red-300 hover:shadow-lg hover:shadow-red-500/10 transition-all duration-300 p-5 rounded-2xl flex flex-col items-center justify-center gap-3 group relative overflow-hidden cursor-pointer">
+            <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="w-12 h-12 bg-[#fff1f2] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="pi pi-unlock text-lg font-bold text-[#f43f5e]"></i>
+            </div>
+            <div class="text-center z-10">
+                <h3 class="text-[14px] font-bold text-[#1e293b]">Evil Twin <span class="text-[9px] font-bold bg-[#fee2e2] text-[#ef4444] px-1.5 py-0.5 rounded tracking-wide align-middle ml-1">OPEN</span></h3>
+                <p class="text-slate-400 text-[12px] mt-0.5 font-medium">Downgrade to Open Auth</p>
+            </div>
+        </button>
+
+        <!-- Mismatch -->
+        <button (click)="injectPayload('mock_4_mismatch.txt')" class="bg-white border border-[#eef2f6] hover:border-purple-300 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 p-5 rounded-2xl flex flex-col items-center justify-center gap-3 group relative overflow-hidden cursor-pointer">
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="w-12 h-12 bg-[#f3e8ff] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="pi pi-sort-alt text-lg font-bold text-[#9333ea]"></i>
+            </div>
+            <div class="text-center z-10">
+                <h3 class="text-[14px] font-bold text-[#1e293b]">Advanced Mismatch</h3>
+                <p class="text-slate-400 text-[12px] mt-0.5 font-medium">Spoofed MAC, wrong Channel</p>
+            </div>
+        </button>
+
+        <!-- Clone -->
+        <button (click)="injectPayload('mock_5_clone.txt')" class="col-span-1 md:col-span-2 bg-[#4374f1] border-none hover:bg-[#3461db] transition-colors duration-300 p-6 rounded-2xl flex items-center justify-start gap-4 group relative overflow-hidden cursor-pointer">
+            <!-- decorative background circles -->
+            <div class="absolute -right-6 -top-10 w-48 h-48 bg-white/10 rounded-full group-hover:scale-110 transition-transform duration-700"></div>
+            <div class="absolute right-12 -bottom-20 w-36 h-36 bg-[#2a4db3]/40 rounded-full group-hover:scale-110 transition-transform duration-700 delay-100"></div>
+            
+            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-[10px] flex items-center justify-center text-white z-10 shadow-sm border border-white/10">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+            </div>
+            <div class="text-left z-10">
+                <h3 class="font-bold text-white mb-0.5 text-[15px]">Twin Clone Attack</h3>
+                <p class="text-blue-100 text-[12px] font-medium leading-[1.4]">Duplicate BSSIDs in same scan matrix.<br>High threat priority.</p>
+            </div>
+            <i class="pi pi-arrow-right text-white/70 ml-auto mr-2 text-[18px] group-hover:text-white transition-colors group-hover:translate-x-1 z-10"></i>
+        </button>
+    </div>
+  </div>
+</p-dialog>

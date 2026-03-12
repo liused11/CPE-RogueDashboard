@@ -137,7 +137,20 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
     this.supabaseService.getDashboardData().subscribe({
       next: (data: DashboardData) => {
-        this.originalAlerts = data.alerts || [];
+        this.originalAlerts = (data.alerts || []).map(alert => {
+          // Handle potential typo from data source
+          if (alert.chanel && !alert.channel) {
+            alert.channel = alert.chanel;
+          }
+          // Extract channel from details if still missing
+          if (!alert.channel && alert.details) {
+            const match = alert.details.match(/Channel\s+(\d+)/i);
+            if (match) {
+              alert.channel = match[1];
+            }
+          }
+          return alert;
+        });
         this.originalWhitelist = data.whitelist || [];
         this.totalAlerts = data.total_alerts || 0;
         this.totalWhitelist = data.total_whitelist || 0;

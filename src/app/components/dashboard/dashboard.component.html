@@ -171,9 +171,9 @@
                 <span *ngIf="currentView === 'alerts'"
                   class="inline-flex items-center justify-center px-2.5 py-1 rounded border text-xs font-bold tracking-wide"
                   [ngClass]="{
-                   'bg-amber-50 text-amber-600 border-amber-200': item.alert_type === 'Rogue AP' || !item.alert_type,
-                   'bg-rose-50 text-rose-600 border-rose-200': item.alert_type === 'Evil Twin',
-                   'bg-orange-50 text-orange-600 border-orange-200': item.alert_type === 'Deauth Attack'
+                   'bg-amber-50 text-amber-600 border-amber-200': (item.alert_type && item.alert_type.includes('Rogue AP')) || !item.alert_type,
+                   'bg-rose-50 text-rose-600 border-rose-200': item.alert_type && item.alert_type.includes('Evil Twin'),
+                   'bg-orange-50 text-orange-600 border-orange-200': item.alert_type && item.alert_type.includes('Deauth Attack')
                  }">
                   {{ item.alert_type || 'Rogue AP' }}
                 </span>

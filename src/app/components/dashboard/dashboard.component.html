@@ -44,8 +44,11 @@
     <div class="flex gap-8 mb-8">
 
       <!-- Box 1: Total Alerts (Like Total Logs) -->
-      <div
-        class="bg-white border-2 border-slate-100 rounded-2xl p-6 w-[360px] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.03)] flex items-start justify-between">
+      <div (click)="setView('alerts')"
+        class="bg-white border-2 rounded-2xl p-6 w-[360px] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.03)] flex items-start justify-between cursor-pointer transition-all duration-300"
+        [class.border-red-200]="currentView === 'alerts'" [class.border-slate-100]="currentView !== 'alerts'"
+        [class.shadow-lg]="currentView === 'alerts'" [class.shadow-red-500/5]="currentView === 'alerts'"
+        [class.bg-red-50/10]="currentView === 'alerts'">
         <div class="flex flex-col">
           <span class="text-slate-400 font-medium text-sm mb-2">Total Alerts</span>
           <span class="text-[32px] font-bold text-[#2b6eff] leading-none mb-1">{{ totalAlerts }}</span>
@@ -58,8 +61,11 @@
       </div>
 
       <!-- Box 2: Total Whitelist (Like Activities) -->
-      <div
-        class="bg-white border-2 border-slate-100 rounded-2xl p-6 w-[360px] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.03)] flex items-start justify-between">
+      <div (click)="setView('whitelist')"
+        class="bg-white border-2 rounded-2xl p-6 w-[360px] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.03)] flex items-start justify-between cursor-pointer transition-all duration-300"
+        [class.border-emerald-200]="currentView === 'whitelist'" [class.border-slate-100]="currentView !== 'whitelist'"
+        [class.shadow-lg]="currentView === 'whitelist'" [class.shadow-emerald-500/5]="currentView === 'whitelist'"
+        [class.bg-emerald-50/10]="currentView === 'whitelist'">
         <div class="flex flex-col">
           <span class="text-slate-400 font-medium text-sm mb-2">Activities</span>
           <span class="text-[32px] font-bold text-[#2b6eff] leading-none mb-1">{{ totalWhitelist }}</span>
@@ -91,7 +97,7 @@
           <div class="relative w-44 h-10 flex items-center">
             <p-datepicker [(ngModel)]="selectedDate" (onSelect)="onDateSelect()" (onClear)="onDateClear()"
               [showIcon]="true" [showClear]="true" placeholder="กรองตามวันที่" styleClass="w-full h-full"
-              inputStyleClass="w-full h-full pl-4 pr-16 text-[13px] bg-white border border-slate-200 rounded-xl text-slate-600 outline-none placeholder:text-slate-400 font-medium hover:border-blue-300 focus:border-[#2b6eff] focus:ring-1 focus:ring-[#2b6eff] transition-all shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)]"
+              inputStyleClass="w-full h-full pl-4 pr-20 text-[13px] bg-white border border-slate-200 rounded-xl text-slate-600 outline-none placeholder:text-slate-400 font-medium hover:border-blue-300 focus:border-[#2b6eff] focus:ring-1 focus:ring-[#2b6eff] transition-all shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)]"
               iconDisplay="input" dateFormat="dd/mm/yy">
               <ng-template #inputicon let-clickcallback="clickCallback">
                 <i class="pi pi-calendar border-l border-slate-200 pl-3 text-slate-500 cursor-pointer absolute right-3.5 top-1/2 -translate-y-1/2" (click)="clickcallback($event)"></i>
@@ -104,6 +110,7 @@
             <i class="pi pi-search absolute left-4 text-slate-400 text-xs z-10 pointer-events-none"></i>
             <p-autoComplete [(ngModel)]="searchQuery" [suggestions]="filteredSuggestions"
               (completeMethod)="filterSearch($event)" (onSelect)="onSearchSelect($event, dt)"
+              (ngModelChange)="onSearchInputChange($event, dt)"
               (onClear)="onSearchClear(dt)" [showClear]="true" placeholder="ค้นหากิจกรรม..." styleClass="w-full h-full"
               inputStyleClass="w-full h-full pl-9 pr-8 text-[13px] bg-white border border-slate-200 rounded-xl text-slate-600 outline-none placeholder:text-slate-400 font-medium hover:border-blue-300 focus:border-[#2b6eff] focus:ring-1 focus:ring-[#2b6eff] transition-all shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)]">
             </p-autoComplete>
@@ -132,33 +139,7 @@
         </div>
       </div>
 
-      <!-- Custom Tabs -->
-      <div class="px-6 border-b-2 border-slate-100 flex gap-10 mt-2">
-        <div (click)="setView('whitelist')"
-          class="cursor-pointer pb-4 flex items-center gap-2 relative transition-colors"
-          [class.text-blue-600]="currentView === 'whitelist'" [class.text-slate-500]="currentView !== 'whitelist'">
-          <i class="pi pi-check-circle" [class.text-emerald-500]="currentView === 'whitelist'"></i>
-          <span class="font-bold text-[13px]" [class.text-[#2b6eff]]="currentView === 'whitelist'">กิจกรรมปกติ
-            (Normal)</span>
-          <span
-            class="bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center shadow-sm">{{
-            whitelist.length }}</span>
-          <div *ngIf="currentView === 'whitelist'"
-            class="absolute -bottom-[2px] left-0 w-full h-[3px] bg-[#2b6eff] rounded-t-lg"></div>
-        </div>
 
-        <div (click)="setView('alerts')" class="cursor-pointer pb-4 flex items-center gap-2 relative transition-colors"
-          [class.text-[#2b6eff]]="currentView === 'alerts'" [class.text-slate-500]="currentView !== 'alerts'">
-          <i class="pi pi-exclamation-triangle" [class.text-red-500]="currentView === 'alerts'"></i>
-          <span class="font-bold text-[13px]" [class.text-red-500]="currentView === 'alerts'">สิ่งที่ต้องตรวจสอบ
-            (Abnormal)</span>
-          <span
-            class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-[4px] min-w-[20px] text-center shadow-sm">{{
-            alerts.length }}</span>
-          <div *ngIf="currentView === 'alerts'"
-            class="absolute -bottom-[2px] left-0 w-full h-[3px] bg-[#2b6eff] rounded-t-lg"></div>
-        </div>
-      </div>
 
       <!-- Data Table -->
       <div class="px-2">
@@ -169,18 +150,17 @@
           <ng-template pTemplate="header">
             <tr>
               <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left"
-                style="width: 15%;">Type</th>
+                style="width: 10%;">Type</th>
               <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left"
-                style="width: 20%;">SSID</th>
+                style="width: 15%;">SSID</th>
               <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left"
                 style="width: 20%;">MAC Address</th>
               <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left"
-                style="width: 20%;">Details</th>
+                style="width: 10%;">CH</th>
+              <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left"
+                style="width: 30%;">Details</th>
               <th class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-left"
                 style="width: 15%;">Date</th>
-              <th *ngIf="currentView === 'alerts'"
-                class="border-b-2 border-slate-100 bg-white text-slate-500 text-xs font-bold py-4 px-6 text-center"
-                style="width: 10%;">Action</th>
             </tr>
           </ng-template>
 
@@ -210,6 +190,10 @@
               <td class="py-4 px-6 text-[13px] font-mono text-slate-500">
                 {{ item.mac_address }}
               </td>
+              <!-- Channel -->
+              <td class="py-4 px-6 text-[13px] font-bold text-blue-600">
+                {{ item.channel || '-' }}
+              </td>
               <!-- Details -->
             <td class="py-4 px-6 text-[13px] text-slate-600">
                <div *ngIf="item.details" class="font-semibold text-[#2b6eff] mb-0.5 leading-relaxed">{{ item.details }}</div>
@@ -224,14 +208,7 @@
               <td class="py-4 px-6 text-[13px] font-medium text-slate-500">
                 {{ item.created_at | date:'medium' }}
               </td>
-              <!-- Action -->
-              <td *ngIf="currentView === 'alerts'" class="py-4 px-6 text-center">
-                <button (click)="trustAlert(item)"
-                  class="text-[#2b6eff] font-bold text-[13px] hover:text-blue-800 transition-colors flex items-center justify-center gap-1.5 mx-auto"
-                  title="Trust this network">
-                  <i class="pi pi-check font-bold"></i> Trust
-                </button>
-              </td>
+
             </tr>
           </ng-template>
 
@@ -292,12 +269,38 @@
     </div>
 
     <div class="flex flex-col gap-1.5">
+      <label for="channel" class="text-[13px] font-[800] text-[#1e293b] flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 bg-[#3b82f6] rounded-full inline-block"></span> Channel
+      </label>
+      <div class="relative">
+        <i class="pi pi-sort-numeric-up absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8] text-[14px]"></i>
+        <input pInputText id="channel" [(ngModel)]="newWhitelist.channel" placeholder="e.g. 6 or 48"
+          class="w-full border border-[#e2e8f0] bg-[#f8fafc] text-slate-800 text-sm pl-10 pr-4 py-3 rounded-xl hover:border-[#93c5fd] focus:border-[#3b82f6] focus:bg-white focus:ring-2 focus:ring-[#3b82f6]/15 outline-none transition-all placeholder:text-slate-400 font-medium" />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
       <label class="text-[13px] font-[800] text-[#1e293b] flex items-center gap-1.5">
         <span class="w-1.5 h-1.5 bg-[#3b82f6] rounded-full inline-block"></span> Encryption
       </label>
-      <p-select [options]="encryptionOptions" [(ngModel)]="newWhitelist.encryption" appendTo="body"
-        styleClass="w-full border border-[#e2e8f0] bg-[#f8fafc] rounded-xl hover:border-[#93c5fd] font-medium text-slate-700">
-      </p-select>
+      <div class="relative">
+        <i class="pi pi-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8] text-[14px] z-10"></i>
+        <p-select [options]="encryptionOptions" [(ngModel)]="newWhitelist.encryption" appendTo="body"
+          optionLabel="label" optionValue="value" placeholder="Select Encryption"
+          styleClass="w-full border border-[#e2e8f0] bg-[#f8fafc] rounded-xl hover:border-[#93c5fd] transition-all h-[46px] flex items-center"
+          contentStyleClass="py-1">
+          <ng-template pTemplate="selectedItem" let-selectedOption>
+            <div class="pl-10 py-1 text-sm font-medium text-slate-700 h-full flex items-center">
+              {{ selectedOption.label }}
+            </div>
+          </ng-template>
+          <ng-template pTemplate="item" let-option>
+            <div class="text-sm font-medium text-slate-700 pl-4 py-2 hover:bg-blue-50 transition-colors w-full">
+              {{ option.label }}
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
     </div>
   </div>
 

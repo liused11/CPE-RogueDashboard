@@ -63,11 +63,29 @@
 }
 
 :host ::ng-deep .p-datepicker-clear-icon {
-  right: 2.8rem !important;
+  right: 3.4rem !important;
   color: #94a3b8 !important;
   font-size: 0.8rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
 }
 
 :host ::ng-deep .p-datepicker-input {
-  padding-right: 4rem !important;
+  padding-right: 5rem !important;
+}
+
+:host ::ng-deep .p-autocomplete-clear-icon {
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #94a3b8 !important;
+  font-size: 0.75rem !important;
+  width: 14px !important;
+  height: 14px !important;
+  cursor: pointer !important;
+}
+
+:host ::ng-deep .p-autocomplete {
+  display: flex !important;
+  align-items: center !important;
 }

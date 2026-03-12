@@ -62,7 +62,8 @@ export class DashboardComponent implements OnInit {
   newWhitelist = {
     ssid: '',
     mac_address: '',
-    encryption: 'WPA2'
+    encryption: 'WPA2',
+    channel: ''
   };
   encryptionOptions = [
     { label: 'WPA3', value: 'WPA3' },
@@ -95,14 +96,14 @@ export class DashboardComponent implements OnInit {
     // Combine all SSIDs and MACs from both lists, ignoring undefined/nulls
     let allStrings: string[] = [];
     
-    // Collect from alerts
-    this.alerts.forEach(item => {
+    // Collect from original alerts
+    this.originalAlerts.forEach(item => {
         if (item.ssid) allStrings.push(item.ssid);
         if (item.mac_address) allStrings.push(item.mac_address);
     });
     
-    // Collect from whitelist
-    this.whitelist.forEach(item => {
+    // Collect from original whitelist
+    this.originalWhitelist.forEach(item => {
         if (item.ssid) allStrings.push(item.ssid);
         if (item.mac_address) allStrings.push(item.mac_address);
     });
@@ -117,12 +118,19 @@ export class DashboardComponent implements OnInit {
   }
 
   onSearchSelect(event: any, tableRef: any) {
-     // event contains the raw string selected
-     tableRef.filterGlobal(event, 'contains');
+    // PrimeNG AutoComplete select event can be an object with .value or just the value
+    const query = event && typeof event === 'object' && 'value' in event ? event.value : event;
+    tableRef.filterGlobal(query, 'contains');
+  }
+
+  onSearchInputChange(query: string, tableRef: any) {
+    // Filter as the user types
+    tableRef.filterGlobal(query || '', 'contains');
   }
 
   onSearchClear(tableRef: any) {
-     tableRef.filterGlobal('', 'contains');
+    this.searchQuery = '';
+    tableRef.filterGlobal('', 'contains');
   }
 
   loadDashboardData() {
@@ -193,11 +201,12 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    const headers = ['Type', 'SSID', 'MAC Address', 'Details', 'Encryption', 'Date'];
+    const headers = ['Type', 'SSID', 'MAC Address', 'Channel', 'Details', 'Encryption', 'Date'];
     const rows = data.map(item => [
       this.currentView === 'alerts' ? (item.alert_type || 'Rogue AP') : 'Trusted',
       item.ssid || '',
       item.mac_address || '',
+      item.channel || '',
       item.details || '',
       item.encryption || '',
       item.created_at ? new Date(item.created_at).toLocaleString() : ''
@@ -238,7 +247,8 @@ export class DashboardComponent implements OnInit {
       await this.supabaseService.trustAlert(
         this.newWhitelist.ssid, 
         this.newWhitelist.mac_address, 
-        this.newWhitelist.encryption
+        this.newWhitelist.encryption,
+        this.newWhitelist.channel
       );
       
       // Update original array
@@ -248,6 +258,7 @@ export class DashboardComponent implements OnInit {
           ssid: this.newWhitelist.ssid, 
           mac_address: this.newWhitelist.mac_address, 
           encryption: this.newWhitelist.encryption,
+          channel: this.newWhitelist.channel,
           created_at: new Date().toISOString()
         }
       ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -257,7 +268,7 @@ export class DashboardComponent implements OnInit {
       
       // Hide and reset
       this.displayAddModal = false;
-      this.newWhitelist = { ssid: '', mac_address: '', encryption: 'WPA2' };
+      this.newWhitelist = { ssid: '', mac_address: '', encryption: 'WPA2', channel: '' };
       
       this.messageService.add({ severity: 'success', summary: 'Successfully added to Whitelist', detail: 'Manual entry saved.' });
     } catch (error) {
@@ -301,7 +312,7 @@ export class DashboardComponent implements OnInit {
 
   async trustAlert(alert: any) {
     try {
-      await this.supabaseService.trustAlert(alert.ssid, alert.mac_address, alert.encryption);
+      await this.supabaseService.trustAlert(alert.ssid, alert.mac_address, alert.encryption, alert.channel);
       
       // Update original arrays
       this.originalAlerts = this.originalAlerts.filter(a => a.mac_address !== alert.mac_address || a.ssid !== alert.ssid);

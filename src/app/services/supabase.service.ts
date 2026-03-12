@@ -30,11 +30,11 @@ export class SupabaseService {
     return this.http.get<DashboardData>(url, { headers });
   }
 
-  async trustAlert(ssid: string, mac_address: string, encryption: string): Promise<any> {
+  async trustAlert(ssid: string, mac_address: string, encryption: string, channel: string = ''): Promise<any> {
     const { data, error } = await this.supabase
       .from('whitelist')
       .insert([
-        { ssid, mac_address, encryption }
+        { ssid, mac_address, encryption, channel }
       ]);
       
     if (error) {

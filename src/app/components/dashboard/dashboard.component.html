@@ -88,13 +88,13 @@
         <div class="flex items-center gap-3 ml-auto">
 
           <!-- Functional Date Picker -->
-          <div class="relative w-40 h-10 flex items-center">
+          <div class="relative w-44 h-10 flex items-center">
             <p-datepicker [(ngModel)]="selectedDate" (onSelect)="onDateSelect()" (onClear)="onDateClear()"
               [showIcon]="true" [showClear]="true" placeholder="กรองตามวันที่" styleClass="w-full h-full"
-              inputStyleClass="w-full h-full pl-4 pr-10 text-[13px] bg-white border border-slate-200 rounded-xl text-slate-600 outline-none placeholder:text-slate-400 font-medium hover:border-blue-300 focus:border-[#2b6eff] focus:ring-1 focus:ring-[#2b6eff] transition-all shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)]"
+              inputStyleClass="w-full h-full pl-4 pr-16 text-[13px] bg-white border border-slate-200 rounded-xl text-slate-600 outline-none placeholder:text-slate-400 font-medium hover:border-blue-300 focus:border-[#2b6eff] focus:ring-1 focus:ring-[#2b6eff] transition-all shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)]"
               iconDisplay="input" dateFormat="dd/mm/yy">
               <ng-template #inputicon let-clickcallback="clickCallback">
-                <i class="pi pi-calendar border-l border-slate-200 pl-3 text-slate-500 cursor-pointer absolute right-4 top-1/2 -translate-y-1/2" (click)="clickcallback($event)"></i>
+                <i class="pi pi-calendar border-l border-slate-200 pl-3 text-slate-500 cursor-pointer absolute right-3.5 top-1/2 -translate-y-1/2" (click)="clickcallback($event)"></i>
               </ng-template>
             </p-datepicker>
           </div>

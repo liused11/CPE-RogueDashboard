@@ -61,3 +61,13 @@
   font-weight: 800 !important;
   color: #1e293b !important;
 }
+
+:host ::ng-deep .p-datepicker-clear-icon {
+  right: 2.8rem !important;
+  color: #94a3b8 !important;
+  font-size: 0.8rem !important;
+}
+
+:host ::ng-deep .p-datepicker-input {
+  padding-right: 4rem !important;
+}
